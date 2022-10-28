@@ -1,20 +1,13 @@
 const express = require('express');
 const { appendFile } = require('fs');
-const mysql = require('mysql');
+const mysql = require('mysql2');
 
 // ENV 
 const dotenv = require('dotenv');
 dotenv.config()
 
-const PORT = process.env.PORT || 3005;
-const app = express();
-
-// Middleware
-app.use(express.urlencoded({ extended: false }));
-app.use(express.json());
-
 // DB connection //
-const db = mysql.createConnection(
+const connection = mysql.createConnection(
     {
         host: process.env.HOST,
         user: process.env.USER,
@@ -23,3 +16,9 @@ const db = mysql.createConnection(
     },
     console.log(`Connected to company_db database`)
 )
+
+connection.connect(function (err){
+    if (err) console.log(err);
+})
+
+module.exports = connection;
