@@ -1,7 +1,6 @@
 const inquirer = require('inquirer');
 const fs = require('fs');
-const helper = require()
-const { prompt }
+const helper = require("./db/helper");
 
 //Create functions based off helper queries to change db
 
@@ -40,14 +39,6 @@ const startingPrompts = [
                 value: "UPDATE_EMPLOYEE_ROLE"
             },
             {
-                name: "Update employee managers",
-                value: "UPDATE_EMPLOYEE_MANAGERS"
-            },
-            {
-                name: "View employee managers",
-                value: "VIEW_EMPLOYEE_MANAGERS"
-            },
-            {
                 name: "View employees by department",
                 value: "VIEW_EMPLOYEES_DEPARTMENT"
             },
@@ -69,10 +60,60 @@ const startingPrompts = [
 
 function init(){
     inquirer.prompt(startingPrompts).then((data) => {
-        switch(data){
-            case(data)
-        }
-    })
+        console.log(data)
+        let choice = data.choices
+        switch(choice){
+            case "":
+            
+            break;
+
+            case "":
+            
+            break;
+
+            case "":
+            
+            break;
+
+            case "":
+            
+            break;
+
+            case "":
+            
+            break;
+
+            case "":
+            
+            break;
+
+            case "":
+            
+            break;
+
+            case "":
+            
+            break;
+
+            case "":
+            
+            break;
+
+            case "":
+            
+            break;
+
+            case "":
+            
+            break;
+
+            case "":
+            
+            break;
+            
+            default:
+            stop();
+        }})
 }
 
 function deleteEmployee(){
