@@ -1,6 +1,6 @@
 // Functions for queries
 // Require connection
-const connection = require("./connection");
+const connection = require("../connection");
 
 class Helper {
   //Passing through connection as a constructor for use throughout helper class
@@ -26,7 +26,7 @@ class Helper {
   viewAllEmployees() {
     return this.connection
       .promise()
-      .query("SELECT employee.id, employee.first_name, employee.last_name;");
+      .query("SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name AS department, role.salary FROM employee LEFT JOIN role on employee.role_id = role.id LEFT JOIN department on role.department_id = department.id;");
   }
   //Create department
   //INSERT INTO department table and SET query department
@@ -63,6 +63,29 @@ class Helper {
     .promise()
     .query("SELECT employee.id, employee.first_name, employee.last_name, role.title FROM employee LEFT JOIN role on employee.role_id = role.id LEFT JOIN department department on role.department_id WHERE department.id = ?", departmentid);
   }
+
+  //Delete employees by id
+  deleteEmployee(employeeid){
+    return this.connection
+    .promise()
+    .query("DELETE FROM employee WHERE id = ?");
+  }
+
+    //Delete department by id
+    deleteDepartment(departmentid){
+      return this.connection
+      .promise()
+      .query("DELETE FROM department WHERE id = ?");
+    }
+
+    //Delete role by id
+    deleteRole(roleid){
+      return this.connection
+      .promise()
+      .query("DELETE FROM role WHERE id = ?");
+    }
 }
+
+
 
 module.exports = new Helper(connection);

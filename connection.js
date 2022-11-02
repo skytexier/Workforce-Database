@@ -1,17 +1,18 @@
+// ENV 
+require('dotenv').config()
+
 const express = require('express');
 const { appendFile } = require('fs');
 const mysql = require('mysql2');
 
-// ENV 
-const dotenv = require('dotenv');
-dotenv.config()
+
 
 // DB connection //
 const connection = mysql.createConnection(
     {
-        host: process.env.HOST,
-        user: process.env.USER,
-        password: process.env.PASSWORD,
+        host: "localhost",
+        user: process.env.DB_USER,
+        password: process.env.DB_PASS,
         database: 'company_db'
     },
     console.log(`Connected to company_db database`)

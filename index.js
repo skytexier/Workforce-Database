@@ -55,6 +55,10 @@ const startingPrompts = [
         name: "Delete employee >:)",
         value: "DELETE_EMPLOYEE",
       },
+      {
+        name: "Stop bulding database",
+        value: "STOP",
+      },
     ],
   },
 ];
@@ -90,13 +94,16 @@ function init() {
         getEmployeeDepartment();
         break;
       case "DELETE_DEPARTMENT":
-        deleteDepartment();
+        removeDepartment();
         break;
       case "DELETE_ROLES":
-        deleteRole();
+        removeRole();
         break;
       case "DELETE_EMPLOYEE":
-        deleteEmploy();
+        fireEmployee();
+        break;
+      case "STOP":
+        stop();
         break;
       default:
         stop();
@@ -186,9 +193,9 @@ function addRole() {
           choices: departmentSelect,
         },
       ])
-      .then((role) => {
+      .then((data) => {
         helper
-          .createRole(role)
+          .createRole(data)
           .then(() => console.log(`Role added.`))
           .then(() => init());
       });
@@ -236,34 +243,162 @@ function addEmployee() {
               first_name: Fname,
               last_name: Lname,
             };
-
-            helper.createEmployee(employee);
+            helper
+              .createEmployee(employee)
+              .then(() => console.log(`Employee added.`))
+              .then(() => init());
           });
       });
     });
 }
 
 function updateEmployeeRole() {
-  helper
-    .viewAllEmployees()
-    .then(([rows]) => {
-      let employees = rows;
-      console.table(employees);
-    })
-    .then(() => init());
+  helper.viewAllEmployees().then(([rows]) => {
+    let employees = rows;
+    const employeeChoice = employees.map(({ id, first_name, last_name }) => ({
+      name: `${first_name} ${last_name}`,
+      value: id,
+    }));
+    inquirer
+      .prompt([
+        {
+          type: "list",
+          name: "employeeId",
+          message: "Who's role would you like to update?",
+          choices: employeeChoice,
+        },
+      ])
+      .then((data) => {
+        let employeeId = data;
+        helper.getRoles().then(([rows]) => {
+          let roles = rows;
+          const roleChoice = roles.map(({ id, title }) => ({
+            name: title,
+            value: id,
+          }));
+          inquirer
+            .prompt([
+              {
+                type: "list",
+                name: "roleId",
+                message: "Which role would you like to assign this person?",
+                choices: roleChoice,
+              },
+            ])
+            .then((data) => {
+              helper.updateRole(employeeId, data);
+            })
+            .then(() => console.log("Role updated"))
+            .then(() => init());
+        });
+      });
+  });
 }
 
 function getEmployeeDepartment() {
   helper
-    .viewAllEmployees()
+    .viewAllDepartments()
     .then(([rows]) => {
-      let employees = rows;
-      console.table(employees);
+      let deparatments = rows;
+      const deparatmentChoice = deparatments.map(({id, name}) => ({
+        name: name,
+        value: id
+      }));
+      inquirer.prompt([
+        {
+          type: "list",
+          name: "departmentId",
+          message: "Which department would you like see employees from?",
+          choices: deparatmentChoice,
+        }
+      ])
+      .then((data) => {
+        helper.getEmployeesByDepartment(data.departmentId)
+      })
+      .then(([rows]) => {
+        let employees = rows;
+        console.table(employees)
+      })
+      .then(() => init());
     })
-    .then(() => init());
+}
+
+function fireEmployee(){
+  helper.viewAllEmployees()
+  .then(([rows]) => {
+    let employees = rows;
+    const employeeChoice = employees.map(({id, first_name, last_name}) => ({
+      name: `${first_name} ${last_name}`,
+      value: id
+    }));
+    inquirer.prompt([
+      {
+        type: "list",
+        name: "employeeId",
+        message: "Who would you like to fire/delete?",
+        choices: employeeChoice
+      }
+    ])
+    .then((data) => {
+      helper.deleteEmployee(data.employeeId)
+    })
+    .then(() => console.log("Employee fired."))
+    .then(() => init())
+  })
+}
+
+function removeDepartment(){
+  helper.viewAllDepartments()
+  .then(([rows]) => {
+    let departments = rows;
+    const departmentChoice = departments.map(({id, name}) => ({
+      name: name,
+      value: id
+    }));
+    inquirer.prompt([
+      {
+        type: "list",
+        name: "departmentId",
+        message: "Which department would you like to delete?",
+        choices: departmentChoice
+      }
+    ])
+    .then((data) => {
+      helper.deleteDepartment(data.departmentId)
+    })
+    .then(() => console.log("Department deleted."))
+    .then(() => init())
+  })
+}
+
+// Remove role
+function removeRole(){
+  helper.viewAllRoles()
+  .then(([rows]) => {
+    let roles = rows;
+    const roleChoice = role.map(({id, title}) => ({
+      name: title,
+      value: id
+    }));
+    inquirer.prompt([
+      {
+        type: "list",
+        name: "roleId",
+        message: "Which role would you like to delete?",
+        choices: roleChoice
+      }
+    ])
+    .then((data) => {
+      helper.deleteDepartment(data.roleId)
+    })
+    .then(() => console.log("Role  deleted."))
+    .then(() => init())
+  })
 }
 
 function stop() {
   console.log("Workforce Database now shutting down!");
   process.abort();
 }
+
+init();
