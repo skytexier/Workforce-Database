@@ -1,7 +1,6 @@
 const inquirer = require("inquirer");
 const fs = require("fs");
 const helper = require("./db/helper");
-const { viewAllDepartments, viewAllRoles } = require("./db/helper");
 
 //Create functions based off helper queries to change db
 //Choice options for database use
@@ -62,6 +61,7 @@ const startingPrompts = [
     ],
   },
 ];
+
 //Init to start inquirer process
 function init() {
   inquirer.prompt(startingPrompts).then((data) => {
@@ -270,7 +270,7 @@ function updateEmployeeRole() {
       ])
       .then((data) => {
         let employeeId = data;
-        helper.getRoles().then(([rows]) => {
+        helper.viewAllRoles().then(([rows]) => {
           let roles = rows;
           const roleChoice = roles.map(({ id, title }) => ({
             name: title,
@@ -286,114 +286,114 @@ function updateEmployeeRole() {
               },
             ])
             .then((data) => {
-              helper.updateRole(employeeId, data);
+              helper.updateRole(employeeId, data)
+              .then(() => init())
+              .then(() => console.log("Role updated"));
             })
-            .then(() => console.log("Role updated"))
-            .then(() => init());
         });
       });
   });
 }
 
 function getEmployeeDepartment() {
-  helper
-    .viewAllDepartments()
-    .then(([rows]) => {
-      let deparatments = rows;
-      const deparatmentChoice = deparatments.map(({id, name}) => ({
-        name: name,
-        value: id
-      }));
-      inquirer.prompt([
+  helper.viewAllDepartments()
+  .then(([rows]) => {
+    let deparatments = rows;
+    const deparatmentChoice = deparatments.map(({ id, name }) => ({
+      name: name,
+      value: id,
+    }));
+    inquirer
+      .prompt([
         {
           type: "list",
           name: "departmentId",
           message: "Which department would you like see employees from?",
           choices: deparatmentChoice,
-        }
+        },
       ])
       .then((data) => {
         helper.getEmployeesByDepartment(data.departmentId)
-      })
-      .then(([rows]) => {
+        .then(([rows]) => {
         let employees = rows;
         console.table(employees)
       })
-      .then(() => init());
+      .then(() => init())
     })
+  })
 }
 
-function fireEmployee(){
-  helper.viewAllEmployees()
-  .then(([rows]) => {
+function fireEmployee() {
+  helper.viewAllEmployees().then(([rows]) => {
     let employees = rows;
-    const employeeChoice = employees.map(({id, first_name, last_name}) => ({
+    const employeeChoice = employees.map(({ id, first_name, last_name }) => ({
       name: `${first_name} ${last_name}`,
-      value: id
+      value: id,
     }));
-    inquirer.prompt([
-      {
-        type: "list",
-        name: "employeeId",
-        message: "Who would you like to fire/delete?",
-        choices: employeeChoice
-      }
-    ])
-    .then((data) => {
-      helper.deleteEmployee(data.employeeId)
-    })
-    .then(() => console.log("Employee fired."))
-    .then(() => init())
+    inquirer
+      .prompt([
+        {
+          type: "list",
+          name: "employeeId",
+          message: "Who would you like to fire/delete?",
+          choices: employeeChoice,
+        }
+      ])
+      .then((data) => {
+        helper.deleteEmployee(data.employeeId)
+        .then(() => console.log("Employee fired."))
+        .then(() => init())
+      })
   })
 }
 
-function removeDepartment(){
-  helper.viewAllDepartments()
-  .then(([rows]) => {
+function removeDepartment() {
+  helper.viewAllDepartments().then(([rows]) => {
     let departments = rows;
-    const departmentChoice = departments.map(({id, name}) => ({
+    const departmentChoice = departments.map(({ id, name }) => ({
       name: name,
-      value: id
+      value: id,
     }));
-    inquirer.prompt([
-      {
-        type: "list",
-        name: "departmentId",
-        message: "Which department would you like to delete?",
-        choices: departmentChoice
-      }
-    ])
-    .then((data) => {
-      helper.deleteDepartment(data.departmentId)
-    })
-    .then(() => console.log("Department deleted."))
-    .then(() => init())
-  })
+    inquirer
+      .prompt([
+        {
+          type: "list",
+          name: "departmentId",
+          message: "Which department would you like to delete?",
+          choices: departmentChoice,
+        },
+      ])
+      .then((data) => {
+        helper.deleteDepartment(data.departmentId)
+        .then(() => console.log("Department deleted."))
+        .then(() => init());
+      })
+  });
 }
 
 // Remove role
-function removeRole(){
-  helper.viewAllRoles()
-  .then(([rows]) => {
+function removeRole() {
+  helper.viewAllRoles().then(([rows]) => {
     let roles = rows;
-    const roleChoice = role.map(({id, title}) => ({
+    const roleChoice = roles.map(({ id, title }) => ({
       name: title,
-      value: id
+      value: id,
     }));
-    inquirer.prompt([
-      {
-        type: "list",
-        name: "roleId",
-        message: "Which role would you like to delete?",
-        choices: roleChoice
-      }
-    ])
-    .then((data) => {
-      helper.deleteDepartment(data.roleId)
-    })
-    .then(() => console.log("Role  deleted."))
-    .then(() => init())
-  })
+    inquirer
+      .prompt([
+        {
+          type: "list",
+          name: "roleId",
+          message: "Which role would you like to delete?",
+          choices: roleChoice,
+        },
+      ])
+      .then((data) => {
+        helper.deleteDepartment(data.roleId)
+        .then(() => console.log("Department deleted."))
+        .then(() => init());
+      })
+  });
 }
 
 function stop() {

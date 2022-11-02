@@ -68,21 +68,21 @@ class Helper {
   deleteEmployee(employeeid){
     return this.connection
     .promise()
-    .query("DELETE FROM employee WHERE id = ?");
+    .query("DELETE FROM employee WHERE id = ?", employeeid);
   }
 
     //Delete department by id
     deleteDepartment(departmentid){
       return this.connection
       .promise()
-      .query("DELETE FROM department WHERE id = ?");
+      .query("DELETE FROM department WHERE id = ?", departmentid);
     }
 
     //Delete role by id
     deleteRole(roleid){
       return this.connection
       .promise()
-      .query("DELETE FROM role WHERE id = ?");
+      .query("DELETE FROM role WHERE id = ?", roleid);
     }
 }
 
