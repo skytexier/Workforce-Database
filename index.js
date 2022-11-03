@@ -91,7 +91,7 @@ function init() {
         updateEmployeeRole();
         break;
       case "VIEW_EMPLOYEES_DEPARTMENT":
-        getEmployeeDepartment();
+        getEmployeesByDepartment();
         break;
       case "DELETE_DEPARTMENT":
         removeDepartment();
@@ -167,7 +167,7 @@ function addDepartment() {
 //Function to add a role
 function addRole() {
   //getting/viewing all employees, then mapping departments based on id and name
-  helper.viewAllEmployees().then(([rows]) => {
+  helper.viewAllDepartments().then(([rows]) => {
     let departments = rows;
     const departmentSelect = departments.map(({ id, name }) => ({
       name: name,
@@ -188,14 +188,16 @@ function addRole() {
         },
         {
           type: "list",
-          name: "deparatment_id",
+          name: "department_id",
           message: "Which department fits this role?",
           choices: departmentSelect,
         },
       ])
       .then((data) => {
+        let role = data
+        console.log(role)
         helper
-          .createRole(data)
+          .createRole(role)
           .then(() => console.log(`Role added.`))
           .then(() => init());
       });
@@ -203,6 +205,7 @@ function addRole() {
 }
 
 //Function to add employee
+//Prompt questions for name, then getting role options, then department options, then manager options and adding them to the db
 function addEmployee() {
   inquirer
     .prompt([
@@ -220,7 +223,6 @@ function addEmployee() {
     .then((data) => {
       let Fname = data.first_name;
       let Lname = data.last_name;
-
       helper.viewAllRoles().then(([rows]) => {
         let roles = rows;
         const roleSelect = roles.map(({ id, title }) => ({
@@ -238,20 +240,38 @@ function addEmployee() {
           ])
           .then((data) => {
             let roleId = data.roleId;
-            let employee = {
-              role_id: roleId,
-              first_name: Fname,
-              last_name: Lname,
-            };
-            helper
-              .createEmployee(employee)
-              .then(() => console.log(`Employee added.`))
-              .then(() => init());
+            helper.viewAllEmployees()
+            .then(([rows]) => {
+              let employees = rows;
+              const managerChoice = employees.map(({id, first_name, last_name}) => ({
+                name: `${first_name} ${last_name}`,
+                value: id
+              }));
+              inquirer.prompt([
+                {
+                  type: "list",
+                  name: "managerId",
+                  message: "Who is their manager?",
+                  choices: managerChoice,
+                }]).then((data) => {
+                  let employee = {
+                    role_id: roleId,
+                    first_name: Fname,
+                    last_name: Lname,
+                  }
+                  helper
+                  .createEmployee(employee)
+                  .then(() => console.log(`Employee added.`))
+                  .then(() => init());
+                })
+            })
           });
       });
     });
 }
 
+//Update Employee Role
+//Getting employees, then inquiring on which employee to change, then roles and reassigning employee to said role
 function updateEmployeeRole() {
   helper.viewAllEmployees().then(([rows]) => {
     let employees = rows;
@@ -269,7 +289,7 @@ function updateEmployeeRole() {
         },
       ])
       .then((data) => {
-        let employeeId = data;
+        let employeeId = data.employeeId;
         helper.viewAllRoles().then(([rows]) => {
           let roles = rows;
           const roleChoice = roles.map(({ id, title }) => ({
@@ -286,16 +306,18 @@ function updateEmployeeRole() {
               },
             ])
             .then((data) => {
-              helper.updateRole(employeeId, data)
+              helper.updateRole(employeeId, data.roleId)
+              .then(() => console.log("Role updated"))
               .then(() => init())
-              .then(() => console.log("Role updated"));
             })
         });
       });
   });
 }
 
-function getEmployeeDepartment() {
+//Get employees by department
+//First get department, based on department selection get employees with matching department id's
+function getEmployeesByDepartment() {
   helper.viewAllDepartments()
   .then(([rows]) => {
     let deparatments = rows;
@@ -313,9 +335,10 @@ function getEmployeeDepartment() {
         },
       ])
       .then((data) => {
-        helper.getEmployeesByDepartment(data.departmentId)
+        helper.getEmployeesDepartment(data.departmentId)
         .then(([rows]) => {
         let employees = rows;
+        console.log("\n");
         console.table(employees)
       })
       .then(() => init())
@@ -323,6 +346,8 @@ function getEmployeeDepartment() {
   })
 }
 
+//Remove employee from db
+//Getting employee table and iterating over the table rows, then prompting which employee to delete
 function fireEmployee() {
   helper.viewAllEmployees().then(([rows]) => {
     let employees = rows;
@@ -346,7 +371,8 @@ function fireEmployee() {
       })
   })
 }
-
+//Remove department
+//First getting department table and iterating over the table rows,then prompting which department to delete
 function removeDepartment() {
   helper.viewAllDepartments().then(([rows]) => {
     let departments = rows;
@@ -372,12 +398,13 @@ function removeDepartment() {
 }
 
 // Remove role
+//First getting roles and iterating over the rows,then prompting which role to delete
 function removeRole() {
   helper.viewAllRoles().then(([rows]) => {
     let roles = rows;
     const roleChoice = roles.map(({ id, title }) => ({
       name: title,
-      value: id,
+      value: id
     }));
     inquirer
       .prompt([
@@ -389,13 +416,15 @@ function removeRole() {
         },
       ])
       .then((data) => {
-        helper.deleteDepartment(data.roleId)
-        .then(() => console.log("Department deleted."))
+        console.log(data)
+        helper.deleteRole(data.roleId)
+        .then(() => console.log("Role deleted."))
         .then(() => init());
       })
   });
 }
 
+//Function to stop the inquirer prompts
 function stop() {
   console.log("Workforce Database now shutting down!");
   process.abort();

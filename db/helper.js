@@ -54,17 +54,18 @@ class Helper {
   updateRole(employeeid, roleid) {
     return this.connection
       .promise()
-      .query("UPDATE employee SET role_id = ? WHERE id = ?", [employeeid, roleid]);
+      .query("UPDATE employee SET role_id = ? WHERE id = ?", [roleid, employeeid]);
   }
   //Get employees by department
   //SELECT employee data, role title from employee table, JOIN role id with employee role id, JOIN department id with role id
-  getEmployeesByDepartment(departmentid){
+  getEmployeesDepartment(departmentid){
     return this.connection
     .promise()
-    .query("SELECT employee.id, employee.first_name, employee.last_name, role.title FROM employee LEFT JOIN role on employee.role_id = role.id LEFT JOIN department department on role.department_id WHERE department.id = ?", departmentid);
+    .query("SELECT employee.id, employee.first_name, employee.last_name, role.title FROM employee LEFT JOIN role on employee.role_id = role.id LEFT JOIN department department on role.department_id = department.id WHERE department.id = ?;", departmentid);
   }
 
   //Delete employees by id
+  //DELETE FROM employee WHERE id = ?
   deleteEmployee(employeeid){
     return this.connection
     .promise()
@@ -72,6 +73,7 @@ class Helper {
   }
 
     //Delete department by id
+    // DELETE FROM department WHERE id = ?
     deleteDepartment(departmentid){
       return this.connection
       .promise()
@@ -79,6 +81,7 @@ class Helper {
     }
 
     //Delete role by id
+    //DELETE FROM role WHERE id = ?
     deleteRole(roleid){
       return this.connection
       .promise()
