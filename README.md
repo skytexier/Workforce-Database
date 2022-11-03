@@ -38,9 +38,8 @@ Here are some examples of the displayed information from some of the database op
 ## Credits
 For this assignment I had to refer back to a lot of course work, recorded lectures and some solved solutions as I missed the past two weeks of class due to a family emergency. My tutor `Andres Jimenez` helped me through a lot of setting up this project and better understandiing SQL queries/keys and so on.
 
-A lot of stackoverflow for debugging.
-- [https://stackoverflow.com/](https://stackoverflow.com/)
-W3Schools on writing errors and understanding how to create error responses.
+
+- A lot of stackoverflow for debugging [https://stackoverflow.com/](https://stackoverflow.com/)
 
 - W3Schools for SQL information [https://www.w3schools.com/sql/](https://www.w3schools.com/sql/)
 
