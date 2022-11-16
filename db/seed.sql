@@ -16,7 +16,7 @@ VALUES ("Regional Manager", 100000, 1),
 ("Junior Sales Advisor", 75000, 1);
 
 INSERT INTO employee (first_name, last_name, role_id, manager_id)
-VALUES ("Michael", "Scott", 1, NULL),
+VALUES ("Michael", "Scott", 1, 1),
 ("Toby", "Flenderson", 2, 1),
 ("Tuna", "Halpert", 5, 1),
 ("Dwight", "Schrute", 6, 1);
